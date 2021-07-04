@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <div class="jumbotron text-center">
+        <h1>To-do List App</h1>
+        {% if task %}
+            <h2>Edit Task Again</h2>
+        {% else %}
+            <h2>Add New Task</h2>
+        {% endif %}
+
+        <form action="/addTask" method="POST" novalidate>
+            {{ form.hidden_tag() }}
+            {% if task %}
+                <input type="hidden" name="hiddenTaskId" value="{{ task.task_id }}">
+            {% else %}
+                <input type="hidden" name="hiddenTaskId" value="0">
+            {% endif %}
+
+            <!-- Description -->
+            <div class="form-group">
+                {{ form.inputDescription.label(class="sr-only") }}
+                {{ form.inputDescription(class="form-control", placeholder="Add some tasks ...") }}
+                {% if form.inputDescription.errors %}
+                    {% for error in form.inputDescription.errors %}
+                    <div class="alert alert-danger">
+                        <strong>Error:</strong> {{ error }}
+                    </div>
+                    {% endfor %}
+                {% endif %}
+            </div>
+            <div class="form-group">
+                {{ form.inputPriority(class="form-control", placeholder="Priority") }}
+            </div>
+            <p class="lead"></p>
+            <p>
+                <div>
+                    {% if task %}
+                        {{ form.submit(class="bt btn-lg btn-info btn-block") }}
+                    {% else %}
+                        {{ form.submit(class="btn btn-lg btn-success btn-block") }}
+                    {% endif %}
+                    <a class="btn btn-lg btn-danger btn-block" href="/userHome">Cancel</a>
+                </div>
+            </p>
+        </form>
+    </div>
+</div>
+{% endblock %}
