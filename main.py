@@ -1,4 +1,4 @@
-import os
+from os import path
 
 from flask import Flask, render_template, redirect, url_for, flash, session, request
 from flask_migrate import Migrate
@@ -7,12 +7,12 @@ from flask_sqlalchemy import SQLAlchemy
 from forms import SignUpForm, SignInForm, TaskForm, EditTaskForm
 
 # Create a base directory...
-basedir = os.path.abspath(os.path.dirname(__file__))
+basedir = path.abspath(path.dirname(__file__))
 # print(basedir)
 
 app = Flask(__name__)
 app.config["SECRET_KEY"] = 'd54dfaa946a6092642414acc6bf1c199'
-app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///" + os.path.join(basedir, "app.db")
+app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///" + path.join(basedir, "app.db")
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 # Init db
@@ -22,6 +22,7 @@ migrate = Migrate(app, db)
 import models
 
 
+# Routing and Writing the main function
 @app.route('/')
 @app.route('/logOut')
 def main():
@@ -38,6 +39,7 @@ def main():
     return render_template('index.html', todolist=todolist, title='Home')
 
 
+# Routing and Writing the addTask function
 @app.route('/addTask', methods=['GET', 'POST'])
 def addTask():
     _user_id = session.get('user')
@@ -65,12 +67,12 @@ def addTask():
                     user=user, description=_description, priority=priority, complete=False
                 )
                 db.session.add(task)
-                flash('You have successfully added item(s): {}'.format(_description), 'success')
+                flash('You have successfully added item(s): {}'.format(_description), category='success')
             else:
                 task = db.session.query(models.Task).filter_by(task_id=_task_id).first()
                 task.description = _description
                 task.priority = priority
-                flash('You have successfully updated item(s): {}'.format(_description), 'success')
+                flash('You have successfully updated item(s): {}'.format(_description), category='success')
 
             db.session.commit()
             return redirect('/userHome')
@@ -80,6 +82,7 @@ def addTask():
     return redirect(url_for(''))
 
 
+# Routing and Writing the updateTask function
 @app.route('/updateTask', methods=['GET', 'POST'])
 def updateTask():
     _user_id = session.get("user")
@@ -92,12 +95,13 @@ def updateTask():
             task.complete = not task.complete
             db.session.commit()
 
-        flash('Task item(s) is {} completed!'.format(task.complete), 'success')
+        flash('Task item(s) is {} completed!'.format(task.complete), category='success')
         return redirect('/userHome')
 
     return redirect(url_for(''))
 
 
+# Routing and Writing the editTask function
 @app.route("/editTask", methods=["GET", "POST"])
 def editTask():
     _user_id = session.get("user")
@@ -124,6 +128,7 @@ def editTask():
     return redirect(url_for(''))
 
 
+# Routing and Writing the deleteTask function
 @app.route('/deleteTask', methods=['GET', 'POST'])
 def deleteTask():
     _user_id = session.get('user')
@@ -136,12 +141,13 @@ def deleteTask():
             db.session.commit()
             print("Deleted task id", _task_id)
 
-        flash('You have successfully deleted item(s)', 'success')
+        flash('You have successfully deleted item(s)', category='success')
         return redirect("/userHome")
 
     return redirect(url_for(''))
 
 
+# Routing and Writing the signUp function
 @app.route('/signUp', methods=['GET', 'POST'])
 def signUp():
     form = SignUpForm()
@@ -161,7 +167,7 @@ def signUp():
             db.session.commit()
             return render_template('signUpSuccess.html', user=user)
         else:
-            flash('Email {} is already exist!'.format(_email))
+            flash('Email {} is already exist!'.format(_email), category='danger')
             return render_template('signUp.html', form=form, title='Sign Up')
 
     # return render_template('signUp.html')
@@ -169,6 +175,7 @@ def signUp():
     return render_template('signUp.html', form=form, title='Sign Up')
 
 
+# Routing and Writing the signIn function
 @app.route('/signIn', methods=['GET', 'POST'])
 def signIn():
     form = SignInForm()
@@ -179,19 +186,20 @@ def signIn():
 
         user = db.session.query(models.User).filter_by(email=_email).first()
         if user is None:
-            flash("Non-exist email address or password!", 'danger')
+            flash("Non-exist email address or password!", category='danger')
         else:
             if user.check_password(_password):
                 session["user"] = user.user_id
                 # return render_template('userHome.html')
-                flash('Login successfully for {}'.format(_email), 'success')
+                flash('Login successfully for {}'.format(_email), category='success')
                 return redirect("/userHome")
             else:
-                flash("Login unsuccessfully for {}".format(_email), 'danger')
+                flash("Login unsuccessfully for {}".format(_email), category='danger')
 
     return render_template("signIn.html", form=form, title="Sign In")
 
 
+# Routing and Writing the userHome function
 @app.route('/userHome', methods=['GET', 'POST'])
 def userHome():
     _user_id = session.get('user')
@@ -203,11 +211,12 @@ def userHome():
         return redirect('/')
 
 
+# Routing and Writing the about function
 @app.route('/about')
 def about():
     return render_template('about.html', title='About')
 
 
-# Run Server
+# Run Server Service
 if __name__ == '__main__':
     app.run(debug=True)

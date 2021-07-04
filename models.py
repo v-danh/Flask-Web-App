@@ -4,6 +4,7 @@ from sqlalchemy.orm import relationship
 from werkzeug.security import generate_password_hash, check_password_hash
 
 
+# Create User class
 class User(db.Model):
     user_id = db.Column(db.Integer, Sequence('user_id_seq'), primary_key=True)
     first_name = db.Column(db.String(64), index=True, nullable=False)
@@ -26,13 +27,13 @@ class User(db.Model):
 # Create Task class
 class Task(db.Model):
     task_id = db.Column(db.Integer, Sequence('task_id_seq'), primary_key=True)
-    description = db.Column(db.String(255), nullable=False)
     user_id = db.Column(db.Integer, ForeignKey('user.user_id'))
+    priority_id = db.Column(db.Integer, ForeignKey('priority.priority_id'))
+    description = db.Column(db.String(255), nullable=False)
     complete = db.Column(db.Boolean)
 
+    # Create relationship between tables
     user = relationship('User', back_populates='tasks')
-
-    priority_id = db.Column(db.Integer, ForeignKey('priority.priority_id'))
     priority = relationship('Priority', back_populates='tasks')
 
     def __repr__(self):
@@ -56,6 +57,7 @@ class Priority(db.Model):
     priority_id = db.Column(db.Integer, Sequence('priority_id_seq'), primary_key=True)
     text = db.Column(db.String(50), nullable=False)
 
+    # Create relationship between tables
     tasks = relationship('Task', back_populates='priority')
 
     def __repr__(self):

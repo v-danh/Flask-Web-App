@@ -1,8 +1,8 @@
 """create user table
 
-Revision ID: d6aafc646193
+Revision ID: 0bdf146ebf68
 Revises: 
-Create Date: 2021-07-03 23:47:12.686871
+Create Date: 2021-07-06 12:12:58.936583
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = 'd6aafc646193'
+revision = '0bdf146ebf68'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -36,10 +36,10 @@ def upgrade():
     op.create_index(op.f('ix_user_last_name'), 'user', ['last_name'], unique=False)
     op.create_table('task',
     sa.Column('task_id', sa.Integer(), nullable=False),
-    sa.Column('description', sa.String(length=255), nullable=False),
     sa.Column('user_id', sa.Integer(), nullable=True),
-    sa.Column('complete', sa.Boolean(), nullable=True),
     sa.Column('priority_id', sa.Integer(), nullable=True),
+    sa.Column('description', sa.String(length=255), nullable=False),
+    sa.Column('complete', sa.Boolean(), nullable=True),
     sa.ForeignKeyConstraint(['priority_id'], ['priority.priority_id'], ),
     sa.ForeignKeyConstraint(['user_id'], ['user.user_id'], ),
     sa.PrimaryKeyConstraint('task_id')
